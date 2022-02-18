@@ -3,8 +3,7 @@ module.exports = {
     browser: true,
     es2021: true,
   },
-  extends: ['plugin:react/recommended', 'airbnb', 'plugin:prettier/recommended'],
-
+  extends: ['plugin:react/recommended', 'airbnb', 'plugin:prettier/recommended', 'next/core-web-vitals'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 'latest',
@@ -19,5 +18,6 @@ module.exports = {
     'react/react-in-jsx-scope': 'off',
     'react/jsx-props-no-spreading': 'off',
     'no-plusplus': 'off',
+    'prettier/prettier': 'error',
   },
 };
