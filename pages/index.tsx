@@ -1,36 +1,61 @@
-import type { NextPage } from 'next'
-import {getDaysInMonth} from 'date-fns'
-
-
+import { v4 as uuid } from 'uuid';
+import moment from 'moment';
+import type { NextPage } from 'next';
+import { useMemo } from 'react';
 
 const Home: NextPage = () => {
-  
-  const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const weekDaysHeader = (
+    <div className="grid grid-cols-7">
+      {moment.weekdays().map((weekDay) => (
+        <span
+          className="flex justify-center items-center  bg-rose-400 border-[1px] border-gray-700 text-center text-xl"
+          key={weekDay}
+        >
+          {weekDay}
+        </span>
+      ))}
+    </div>
+  );
 
-  const firstDateOfMonth = new Date(`${new Date().getFullYear()}-${new Date().getMonth() + 1}-01`);
-  console.log(`@@@@@ [LOG] ${new Date().toLocaleString()}  -> days`, firstDateOfMonth)
-  const days = []
-  
-  while (firstDateOfMonth.getMonth() === 1) {
-    days.push(new Date(firstDateOfMonth));
-    firstDateOfMonth.setDate(firstDateOfMonth.getDate() + 1);
-  }
-  console.log(`@@@@@ [LOG] ${new Date().toLocaleString()}  -> days`, days)
-  
+  const daysInMonth = useMemo(() => {
+    const momentObject = moment().startOf('month');
+    const firstDay = parseInt(moment(momentObject).format('d'), 10);
+    const lastDay = moment(momentObject).endOf('month').toDate().getDate();
+    const lastMonth = moment(momentObject).subtract(1, 'months').endOf('month');
+
+    const result = [];
+    for (let i = 0; i < firstDay; i++) {
+      result.push(
+        <span
+          className="bg-gray-400 border-[1px] border-gray-700 cursor-pointer hover:opacity-90 transition-opacity delay-75"
+          key={uuid()}
+        >
+          {moment(lastMonth)
+            .subtract(firstDay - 1 - i, 'days')
+            .toDate()
+            .getDate()}
+        </span>
+      );
+    }
+
+    for (let day = 0; day < lastDay; day++) {
+      result.push(
+        <span className="border-[1px] border-gray-700" key={uuid()}>
+          {moment(momentObject).add(day, 'days').toDate().getDate()}
+        </span>
+      );
+    }
+
+    return result;
+  }, []);
+
   return (
-    
-      <div className='grid gap-3 grid-cols-7 bg-sky-600 h-full'>
-        {daysOfWeek.map(day => (
-          <span className='flex item-center justify-center h-full' key={day}>{day}</span>
-          ))}
-        {days.map(day => (
-          <span className='flex item-center justify-center h-full' key={day.getDate()}>{day.getDate()}</span>
-        ))}
-      </div>
-      
-    
-    
-  )
-}
+    <div className="h-screen bg-blue-400">
+      {' '}
+      {weekDaysHeader}
+      <div className="grid grid-cols-7 bg-red-100 h-full max-h-full ">{daysInMonth}</div>
+    </div>
+  );
+};
 
-export default Home
+export default Home;
