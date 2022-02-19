@@ -19,5 +19,9 @@ module.exports = {
     'react/jsx-props-no-spreading': 'off',
     'no-plusplus': 'off',
     'prettier/prettier': 'error',
+    'import/prefer-default-export': 'off',
+    'import/extensions': 'off',
+    'react/jsx-no-constructed-context-values': 'off',
+    'react/require-default-props': 'off',
   },
 };
