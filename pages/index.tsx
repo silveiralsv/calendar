@@ -6,10 +6,11 @@ import { Modal } from '../components/Modal';
 const Home: NextPage = () => {
   const [visible, setVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [reminderId, setReminderId] = useState<string>();
 
   const handleAddReminder = (isVisible: boolean, date: Date) => {
-    setVisible(isVisible);
     setSelectedDate(date);
+    setVisible(isVisible);
   };
 
   return (

@@ -13,8 +13,8 @@ module.exports = {
         },
       },
       animation: {
-        'fade-in': 'fade-in 0.5s ease-in-out',
-        blur: 'blur 0.5s ease-in-out',
+        'fade-in': 'fade-in 0.5s linear',
+        blur: 'blur 0.5s linear',
       },
     },
   },

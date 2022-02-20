@@ -23,5 +23,6 @@ module.exports = {
     'import/extensions': 'off',
     'react/jsx-no-constructed-context-values': 'off',
     'react/require-default-props': 'off',
+    'no-param-reassign': 'off',
   },
 };

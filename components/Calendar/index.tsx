@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid';
 import moment from 'moment';
 import { AddBtn } from '../Buttons/add';
 import { useReminder } from '../../hooks/reminder';
+import { ReminderPreview } from '../Reminder';
 
 type CalendarProps = {
   // eslint-disable-next-line no-unused-vars
@@ -10,7 +11,7 @@ type CalendarProps = {
 };
 
 export const Calendar: React.FC<CalendarProps> = ({ handleAddReminder }) => {
-  const { getRemindersPreview, reminders } = useReminder();
+  const { getRemindersPreview, reminders, removeReminder } = useReminder();
 
   const weekDaysHeader = moment.weekdays().map((weekDay) => (
     <th className="bg-rose-400 border-[1px] border-gray-700 text-center text-base md:text-xl" key={weekDay}>
@@ -50,10 +51,23 @@ export const Calendar: React.FC<CalendarProps> = ({ handleAddReminder }) => {
         addTableColum(
           <>
             <span className="relative flex justify-center">{dateAdd.getDate()}</span>
-            <div className="flex flex-col gap-y-1.5 snap-y max-h-[70%] overflow-y-hidden  group-hover:overflow-y-auto scroll-smooth snap-mandatory px-1">
-              {getRemindersPreview(dateAdd)}
+            <div className="flex flex-col gap-y-1.5 snap-y max-h-[70%] overflow-x-hidden  group-hover:overflow-y-auto scroll-smooth snap-mandatory px-1">
+              {getRemindersPreview(dateAdd)?.map((reminder) => (
+                <ReminderPreview
+                  key={reminder.id}
+                  date={reminder.date}
+                  id={reminder?.id}
+                  removeReminder={() => removeReminder(reminder?.id)}
+                  title={reminder?.title}
+                  color={reminder?.color}
+                />
+              ))}
             </div>
-            <AddBtn handleAddReminder={() => handleAddReminder(true, moment(momentObject).add(day, 'days').toDate())} />
+            <AddBtn
+              handleAddReminder={() => {
+                handleAddReminder(true, dateAdd);
+              }}
+            />
           </>
         )
       );

@@ -4,7 +4,7 @@ type InputProps = {
   label: string;
   placeholder?: string;
   maxLength?: number;
-  type: 'text' | 'color';
+  type: React.HTMLInputTypeAttribute;
   // eslint-disable-next-line no-unused-vars
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   value: string;
@@ -17,6 +17,7 @@ export const Input: React.FC<InputProps> = ({ label, placeholder, maxLength, typ
       <input
         value={value}
         type={type}
+        datatype="Date"
         onChange={onChange}
         className={`${
           type === 'color' ? 'cursor-pointer border-none' : 'border-[1.5px] border-gray-800'

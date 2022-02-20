@@ -1,7 +1,8 @@
 /* eslint-disable react/jsx-key */
-import React, { createContext, useCallback, useContext, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
-import { ReminderPreview } from '../components/Reminder';
+
+const storageKey = '@Calenddar:reminders';
 
 type ReminderContent = {
   id: string;
@@ -17,9 +18,11 @@ type ReminderContextData = {
   // eslint-disable-next-line no-unused-vars
   addReminder(newReminder: Partial<Omit<ReminderContent, 'id'>>): void;
   // eslint-disable-next-line no-unused-vars
-  getReminder(date: Date): ReminderContent[];
+  getReminder(id: string): ReminderContent | undefined;
   // eslint-disable-next-line no-unused-vars
-  getRemindersPreview(date: Date): React.ReactNode[];
+  upsertReminder(newReminder: Partial<Omit<ReminderContent, 'id'>>, id?: string): void;
+  // eslint-disable-next-line no-unused-vars
+  getRemindersPreview(date: Date): ReminderContent[];
   // eslint-disable-next-line no-unused-vars
   removeReminder(id: string): void;
   // eslint-disable-next-line no-unused-vars
@@ -31,7 +34,22 @@ type ReminderContextData = {
 const ReminderContext = createContext<ReminderContextData>({} as ReminderContextData);
 
 export const ReminderProvider: React.FC = ({ children }) => {
-  const [reminders, setReminders] = useState<ReminderContent[]>([]);
+  const [reminders, setReminders] = useState<ReminderContent[]>(() => {
+    if (typeof window !== 'undefined') {
+      const storagedReminders = localStorage.getItem(storageKey);
+      if (storagedReminders) {
+        return JSON.parse(storagedReminders).map((reminder: ReminderContent) => ({
+          ...reminder,
+          date: new Date(reminder.date),
+        }));
+      }
+    }
+    return [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem(storageKey, JSON.stringify(reminders));
+  }, [reminders]);
 
   const addReminder = useCallback((reminder: Omit<ReminderContent, 'id'>) => {
     const newReminder = {
@@ -58,34 +76,19 @@ export const ReminderProvider: React.FC = ({ children }) => {
       const reminderComponents = reminders
         .filter(
           (reminder) =>
-            reminder.date.getDate() === date.getDate() &&
-            reminder.date.getMonth() === date.getMonth() &&
-            reminder.date.getFullYear() === date.getFullYear()
+            reminder?.date?.getDate() === date?.getDate() &&
+            reminder?.date?.getMonth() === date?.getMonth() &&
+            reminder?.date?.getFullYear() === date?.getFullYear()
         )
-        ?.sort((a, b) => a.date.getTime() - b.date.getTime())
-        .map((reminder) => (
-          <ReminderPreview
-            key={reminder.id}
-            id={reminder.id}
-            removeReminder={() => removeReminder(reminder.id)}
-            title={reminder.title}
-            color={reminder.color}
-          />
-        ));
-
+        ?.sort((a, b) => a.date.getTime() - b.date.getTime());
       return reminderComponents;
     },
     [reminders]
   );
 
   const getReminder = useCallback(
-    (date: Date) => {
-      const found = reminders.filter(
-        (reminder) =>
-          reminder.date.getDate() === date.getDate() &&
-          reminder.date.getMonth() === date.getMonth() &&
-          reminder.date.getFullYear() === date.getFullYear()
-      );
+    (id) => {
+      const found = reminders.find((reminder) => reminder.id === id);
       return found;
     },
     [reminders]
@@ -95,6 +98,19 @@ export const ReminderProvider: React.FC = ({ children }) => {
     (ids: string[]) => {
       const removedReminders = reminders.filter((reminder) => !ids.includes(reminder.id));
       setReminders(removedReminders);
+    },
+    [reminders]
+  );
+
+  const upsertReminder = useCallback(
+    (newReminder: ReminderContent) => {
+      if (!newReminder?.id) newReminder.id = uuid();
+
+      setReminders((olds) => {
+        const deduped = olds.filter((i) => i.id !== newReminder.id);
+
+        return [...deduped, newReminder];
+      });
     },
     [reminders]
   );
@@ -109,6 +125,7 @@ export const ReminderProvider: React.FC = ({ children }) => {
         removeReminder,
         removeAllReminders,
         getAllReminders,
+        upsertReminder,
       }}
     >
       {children}
