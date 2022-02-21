@@ -78,7 +78,7 @@ export const Calendar: React.FC = () => {
             {reminders?.length > 0 && (
               <DeleteBtn
                 onClick={() => {
-                  removeAllReminders(dateAdd);
+                  removeAllReminders(reminders.map(i => i.id));
                 }}
               />
             )}

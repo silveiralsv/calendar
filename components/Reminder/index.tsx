@@ -18,9 +18,9 @@ export const ReminderPreview: React.FC<ReminderPreviewProps> = ({ color, title, 
   const { getReminder } = useReminder();
   const isBgDark = useMemo(() => Color(color || '#FFFFFF').isDark(), [color]);
 
-  const reminder = useMemo(() => {
-    return getReminder(id);
-  }, [id]);
+  const reminder = getReminder(id);
+  console.log(`@@@@@ [LOG] ${new Date().toLocaleString()}  -> reminder`, reminder)
+  
 
   return (
     <div

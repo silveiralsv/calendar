@@ -59,7 +59,8 @@ export const Modal: React.FC = () => {
   const [form, setForm] = useState<FormType>({
     color: '#1e293b',
   } as FormType);
-
+  
+  console.log(`@@@@@ [LOG] ${new Date().toLocaleString()}  -> form`, form)
   const [forecast, setForecast] = useState<ForecastObject>({} as ForecastObject);
 
   useEffect(() => {
@@ -85,14 +86,14 @@ export const Modal: React.FC = () => {
       ...old,
       title: result.title,
       city: result.city,
-      date: moment(result.date).format('YYYY-MM-DDThh:mm'),
+      date: moment(result.date).format('YYYY-MM-DDTHH:mm'),
       description: result.description,
       color: result.color,
     }));
     setForecast({
       ...result.forecast,
     } as ForecastObject);
-  }, [reminderId, visible]);
+  }, [reminderId, visible, date]);
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((old) => ({
@@ -129,11 +130,9 @@ export const Modal: React.FC = () => {
   const handleSubmitForm = useCallback(async () => {
     const isValid = await handleValidate(form);
     if (!isValid) return;
-
     const { city, color, date: formDate, description, title } = form;
-
     const parsedDate = new Date(formDate);
-
+    console.log(`@@@@@ [LOG] ${new Date().toLocaleString()}  -> parsedDate`, parsedDate)
     setIsLoading(true);
 
     const forecastForNewReminder = await getForecast(city, parsedDate);

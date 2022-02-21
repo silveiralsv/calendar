@@ -30,13 +30,14 @@ type ReminderContextData = {
   // eslint-disable-next-line no-unused-vars
   removeReminder(id: string): void;
   // eslint-disable-next-line no-unused-vars
-  removeAllReminders(date: Date): void;
+  removeAllReminders(ids: string[]): void;
   reminders: ReminderContent[];
 };
 
 export const ReminderContext = createContext<ReminderContextData>({} as ReminderContextData);
 
 export const ReminderProvider: React.FC = ({ children }) => {
+  
   const [reminders, setReminders] = useState<ReminderContent[]>(() => {
     if (typeof window !== 'undefined') {
       const storagedReminders = localStorage.getItem(storageKey);
@@ -86,12 +87,8 @@ export const ReminderProvider: React.FC = ({ children }) => {
   );
 
   const removeAllReminders = useCallback(
-    (date: Date) => {
-      const removedReminders = reminders.filter((reminder) => 
-      reminder?.date?.getDate() !== date?.getDate() &&
-            reminder?.date?.getMonth() !== date?.getMonth() &&
-            reminder?.date?.getFullYear() !== date?.getFullYear()
-      );
+    (ids: string[]) => {
+      const removedReminders = reminders.filter((reminder) => !ids.includes(reminder.id));
       setReminders(removedReminders);
     },
     [reminders]
@@ -100,6 +97,7 @@ export const ReminderProvider: React.FC = ({ children }) => {
   const upsertReminder = useCallback(
     (newReminder: ReminderContent) => {
       if (!newReminder?.id) newReminder.id = uuid();
+      console.log(`@@@@@ [LOG] ${new Date().toLocaleString()}  -> newReminder`, newReminder)
 
       setReminders((olds) => {
         const deduped = olds.filter((i) => i.id !== newReminder.id);

@@ -6,7 +6,7 @@ import { v4 as uuid } from 'uuid';
 import { ForecastConditions } from '../components/Map/forecast';
 import { geoApi, weatherApi } from '../services/api';
 
-const appid = process.env.API_KEY
+
 export type LatLongObject = {
   lat: number;
   lng: number;
@@ -30,6 +30,7 @@ type ModalContextData = {
   dismissModal: () => void;
   showModal: (date: Date, id?: string) => void;
   getForecast: (cityname: string, date:Date) => Promise<ForecastObject>;
+  updateAppId: (appid: string) => void;
   visible: boolean;
   date: Date;
   reminderId: string;
@@ -41,6 +42,11 @@ export const ModalProvider: React.FC = ({ children }) => {
   const [visible, setVisible] = useState(false);
   const [date, setDate] = useState(new Date());
   const [reminderId, setReminderId] = useState<string>(uuid());
+  const [appId, setAppId] = useState('')  
+
+  const updateAppId = useCallback((newId) => {
+    setAppId(newId)
+  },[])
 
   const showModal = useCallback((modalDefaultDate: Date, id = uuid()) => {
     setDate(modalDefaultDate);
@@ -63,7 +69,7 @@ export const ModalProvider: React.FC = ({ children }) => {
       const { data } = await geoApi.get('direct', {
         params: {
           q: cityName,
-          appid: appid,
+          appid: appId,
         },
       });
 
@@ -76,7 +82,7 @@ export const ModalProvider: React.FC = ({ children }) => {
             lat,
             lon,
             exclude: 'minutely,hourly',
-            appid: appid,
+            appid: appId,
           },
         });
 
@@ -108,11 +114,12 @@ export const ModalProvider: React.FC = ({ children }) => {
       }
     } catch (error) {}
     return foreCastResult;
-  }, []);
+  }, [appId]);
 
   return (
     <ModalContext.Provider
       value={{
+        updateAppId,
         dismissModal,
         visible,
         reminderId,
@@ -133,3 +140,5 @@ export function useModal(): ModalContextData {
 
   return context;
 }
+
+
