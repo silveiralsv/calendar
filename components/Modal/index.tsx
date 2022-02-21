@@ -1,5 +1,5 @@
 /* eslint-disable no-unsafe-optional-chaining */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import * as Yup from 'yup';
 import {
   FaCloud,
@@ -16,8 +16,7 @@ import { SubmitBtn } from '../Buttons/submit';
 import { Input } from '../Form/input';
 import { SeccondaryBtn } from '../Buttons/seccondary';
 import { ForecastObject, useModal } from '../../hooks/modal';
-import { useReminder } from '../../hooks/reminder';
-import { geoApi, weatherApi } from '../../services/api';
+import { ReminderContent, useReminder } from '../../hooks/reminder';
 import getValidationErrors from '../../utils/getValidationErrors';
 
 type ForecastConditions = {
@@ -30,6 +29,7 @@ type ForecastConditions = {
   Clouds: React.ReactNode;
   Unknown: React.ReactNode;
 };
+
 const result: ForecastConditions = {
   Thunderstorm: <FaCloudShowersHeavy className="w-5 h-5 fill-gray-500" />,
   Drizzle: <FaCloudSunRain className="w-5 h-5 fill-sky-500" />,
@@ -41,9 +41,7 @@ const result: ForecastConditions = {
   Unknown: <FaQuestionCircle className="w-5 h-5 fill-yellow-500" />,
 };
 
-type ModalProps = {
-  reminderId?: string;
-};
+
 
 type FormType = {
   date: string;
@@ -53,124 +51,48 @@ type FormType = {
   city: string;
 };
 
-export const Modal: React.FC<ModalProps> = () => {
-  const { visible, dismissModal, reminderId, date } = useModal();
-  const { upsertReminder } = useReminder();
-  const { getReminder } = useReminder();
+export const Modal: React.FC = () => {
+  const { visible, dismissModal, reminderId, date, getForecast } = useModal();
+  const { upsertReminder, getReminder } = useReminder();
   const [isLoading, setIsLoading] = useState(false);
   const [erro, setError] = useState<FormType>({} as FormType);
   const [form, setForm] = useState<FormType>({
-    color: '#bbbbbb',
+    color: '#1e293b',
   } as FormType);
+
   const [forecast, setForecast] = useState<ForecastObject>({} as ForecastObject);
 
   useEffect(() => {
-    setForm((old) => ({
-      ...old,
-      date: moment(date).format('YYYY-MM-DDThh:mm'),
-    }));
-  }, [date]);
-
-  useEffect(() => {
     const remind = getReminder(reminderId);
-    if (remind) {
-      setForm((old) => ({
-        ...old,
-        title: remind.title,
-        city: remind.city,
-        date: moment(remind.date).format('YYYY-MM-DDThh:mm'),
-        description: remind.description,
-        color: remind.color,
-      }));
-
-      setForecast(
-        (old) =>
-          ({
-            ...old,
-            main: remind.forecast?.main,
-            description: remind.forecast?.description,
-            icon: remind.forecast?.icon,
-            temperature: remind.forecast?.temperature,
-          } as ForecastObject)
-      );
-    } else {
-      setForm((old) => ({
-        ...old,
-        title: '',
-        city: '',
-        date: moment(date).format('YYYY-MM-DDThh:mm'),
-        description: '',
-        color: '#bbbbbb',
-      }));
-
-      setForecast({
-        main: 'Unknown',
+    let result: ReminderContent = {
+      id: '',
+      city: '',
+      color: '#1e293b',
+      date: date,
+      description: '',
+      title: '',
+      forecast: {
         description: '',
         icon: '',
+        main: 'Unknown',
         temperature: 0,
-      });
-    }
-  }, [reminderId, visible, getReminder]);
-
-  const getForecast = async (cityName: string, reminderDate: Date) => {
-    let foreCastResult: ForecastObject = {
-      main: 'Unknown',
-      description: '',
-      icon: '',
-      temperature: 0,
+      },
     };
-    try {
-      const { data } = await geoApi.get('direct', {
-        params: {
-          q: cityName,
-          appid: '6482b9251ae8db457c4cb602b8dd6c7a',
-        },
-      });
-
-      const { lat, lon } = data?.[0] || { lat: 0, lon: 0 };
-
-      if (lat && lon) {
-        let temperature: number = 0;
-        const { data: forecastData } = await weatherApi.get('onecall', {
-          params: {
-            lat,
-            lon,
-            exclude: 'minutely,hourly',
-            appid: '6482b9251ae8db457c4cb602b8dd6c7a',
-          },
-        });
-
-        const dayForecast = (forecastData?.daily.find(
-          (i: {
-            dt: number;
-            temp: { day: number };
-            weather: Array<{ main: string; description: string; icon: string }>;
-          }) => {
-            const forecastDate = new Date(i.dt * 1000);
-
-            if (
-              forecastDate?.getDate() === reminderDate.getDate() &&
-              forecastDate?.getMonth() === reminderDate.getMonth() &&
-              forecastDate?.getFullYear() === reminderDate.getFullYear()
-            ) {
-              temperature = Math.ceil(i.temp.day / 10);
-              return true;
-            }
-            return false;
-          }
-        )?.weather?.[0] as ForecastObject) || {
-          main: 'Unknown',
-          icon: '',
-          description: '',
-        };
-
-        foreCastResult = { ...dayForecast, temperature };
-      }
-    } catch (error) {
-      console.log(`@@@@@ [LOG] ${new Date().toLocaleString()}  -> error`, error);
+    if (remind) {
+      result = remind;
     }
-    return foreCastResult;
-  };
+    setForm((old) => ({
+      ...old,
+      title: result.title,
+      city: result.city,
+      date: moment(result.date).format('YYYY-MM-DDThh:mm'),
+      description: result.description,
+      color: result.color,
+    }));
+    setForecast({
+      ...result.forecast,
+    } as ForecastObject);
+  }, [reminderId, visible]);
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((old) => ({
@@ -183,7 +105,7 @@ export const Modal: React.FC<ModalProps> = () => {
     }));
   };
 
-  const handleValidate = useCallback(async () => {
+  const handleValidate = async (formShape: FormType) => {
     try {
       const schema = Yup.object().shape({
         title: Yup.string().required('Title is required').max(10, 'Title is too long(max: 10)'),
@@ -193,7 +115,7 @@ export const Modal: React.FC<ModalProps> = () => {
         description: Yup.string().required('Description is required').max(30, 'Description is too long(max: 30)'),
       });
 
-      await schema.validate(form, { abortEarly: false });
+      await schema.validate(formShape, { abortEarly: false });
       return true;
     } catch (error) {
       if (error instanceof Yup.ValidationError) {
@@ -202,10 +124,10 @@ export const Modal: React.FC<ModalProps> = () => {
       }
       return false;
     }
-  }, [form]);
+  };
 
-  const handleSubmitForm = async () => {
-    const isValid = await handleValidate();
+  const handleSubmitForm = useCallback(async () => {
+    const isValid = await handleValidate(form);
     if (!isValid) return;
 
     const { city, color, date: formDate, description, title } = form;
@@ -213,8 +135,9 @@ export const Modal: React.FC<ModalProps> = () => {
     const parsedDate = new Date(formDate);
 
     setIsLoading(true);
-    const forecastForNewReminder = await getForecast(city, parsedDate);
 
+    const forecastForNewReminder = await getForecast(city, parsedDate);
+    setForecast(forecastForNewReminder);
     upsertReminder({
       id: reminderId,
       color,
@@ -231,9 +154,9 @@ export const Modal: React.FC<ModalProps> = () => {
       date: '',
       title: '',
       description: '',
-      color: '#bbbbbb',
+      color: '#1e293b',
     });
-  };
+  }, [form, reminderId]);
 
   return (
     <div
@@ -307,7 +230,7 @@ export const Modal: React.FC<ModalProps> = () => {
             )}
 
             <div className="flex items-center justify-evenly">
-              <SubmitBtn text="Create" loading={isLoading} />
+              <SubmitBtn text="Save" loading={isLoading} />
               <SeccondaryBtn text="Cancel" onClick={() => dismissModal()} />
             </div>
           </form>

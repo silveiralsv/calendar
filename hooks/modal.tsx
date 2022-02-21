@@ -1,22 +1,12 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/jsx-key */
-import moment from 'moment';
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import {
-  FaCloud,
-  FaCloudRain,
-  FaCloudShowersHeavy,
-  FaCloudSun,
-  FaCloudSunRain,
-  FaQuestionCircle,
-  FaSnowflake,
-  FaSun,
-} from 'react-icons/fa';
+
+import React, { createContext, useCallback, useContext,  useState } from 'react';
 import { v4 as uuid } from 'uuid';
 import { ForecastConditions } from '../components/Map/forecast';
 import { geoApi, weatherApi } from '../services/api';
-import { useReminder } from './reminder';
 
+const appid = process.env.API_KEY
 export type LatLongObject = {
   lat: number;
   lng: number;
@@ -39,6 +29,7 @@ type FormType = {
 type ModalContextData = {
   dismissModal: () => void;
   showModal: (date: Date, id?: string) => void;
+  getForecast: (cityname: string, date:Date) => Promise<ForecastObject>;
   visible: boolean;
   date: Date;
   reminderId: string;
@@ -61,6 +52,64 @@ export const ModalProvider: React.FC = ({ children }) => {
     setVisible(false);
   }, []);
 
+  const getForecast = useCallback(async (cityName: string, reminderDate: Date) => {
+    let foreCastResult: ForecastObject = {
+      main: 'Unknown',
+      description: '',
+      icon: '',
+      temperature: 0,
+    };
+    try {
+      const { data } = await geoApi.get('direct', {
+        params: {
+          q: cityName,
+          appid: appid,
+        },
+      });
+
+      const { lat, lon } = data?.[0] || { lat: 0, lon: 0 };
+
+      if (lat && lon) {
+        let temperature: number = 0;
+        const { data: forecastData } = await weatherApi.get('onecall', {
+          params: {
+            lat,
+            lon,
+            exclude: 'minutely,hourly',
+            appid: appid,
+          },
+        });
+
+        const dayForecast = (forecastData?.daily.find(
+          (i: {
+            dt: number;
+            temp: { day: number };
+            weather: Array<{ main: string; description: string; icon: string }>;
+          }) => {
+            const forecastDate = new Date(i.dt * 1000);
+
+            if (
+              forecastDate?.getDate() === reminderDate.getDate() &&
+              forecastDate?.getMonth() === reminderDate.getMonth() &&
+              forecastDate?.getFullYear() === reminderDate.getFullYear()
+            ) {
+              temperature = Math.ceil(i.temp.day / 10);
+              return true;
+            }
+            return false;
+          }
+        )?.weather?.[0] as ForecastObject) || {
+          main: 'Unknown',
+          icon: '',
+          description: '',
+        } ;
+
+        foreCastResult = { ...dayForecast, temperature };
+      }
+    } catch (error) {}
+    return foreCastResult;
+  }, []);
+
   return (
     <ModalContext.Provider
       value={{
@@ -69,6 +118,7 @@ export const ModalProvider: React.FC = ({ children }) => {
         reminderId,
         date,
         showModal,
+        getForecast,
       }}
     >
       {children}

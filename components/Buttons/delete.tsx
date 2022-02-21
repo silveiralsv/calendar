@@ -1,19 +1,19 @@
 import React from 'react';
 
-import { FaPlus } from 'react-icons/fa';
+import { FaTrashAlt } from 'react-icons/fa';
 
-type AddBtnProps = {
+type DeleteBtn = {
   // eslint-disable-next-line no-unused-vars
-  handleAddReminder: (...props: any) => void;
+  onClick: (...props: any) => void;
 };
 
-export const AddBtn: React.FC<AddBtnProps> = ({ handleAddReminder }) => {
+export const DeleteBtn: React.FC<DeleteBtn> = ({ onClick }) => {
   return (
     <button
       className="
         absolute
         bottom-1
-        right-1
+        left-1
         opacity-0
         group-hover:opacity-100
         transition-all
@@ -28,10 +28,10 @@ export const AddBtn: React.FC<AddBtnProps> = ({ handleAddReminder }) => {
         justify-center"
       type="button"
       onClick={() => {
-        handleAddReminder();
+        onClick();
       }}
     >
-      <FaPlus className="fill-white w-3 h-3" />
+      <FaTrashAlt className="fill-white w-3 h-3" />
     </button>
   );
 };
