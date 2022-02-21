@@ -94,7 +94,6 @@ export const Calendar: React.FC = () => {
 
   return (
     <>
-      {/* <Modal visible={visible} setVisible={setVisible} /> */}
       <table className="table-fixed w-full h-full">
         <thead>
           <tr>{weekDaysHeader}</tr>

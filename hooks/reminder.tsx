@@ -34,7 +34,7 @@ type ReminderContextData = {
   reminders: ReminderContent[];
 };
 
-const ReminderContext = createContext<ReminderContextData>({} as ReminderContextData);
+export const ReminderContext = createContext<ReminderContextData>({} as ReminderContextData);
 
 export const ReminderProvider: React.FC = ({ children }) => {
   const [reminders, setReminders] = useState<ReminderContent[]>(() => {
@@ -99,7 +99,6 @@ export const ReminderProvider: React.FC = ({ children }) => {
 
       setReminders((olds) => {
         const deduped = olds.filter((i) => i.id !== newReminder.id);
-
         return [...deduped, { ...newReminder }];
       });
     },

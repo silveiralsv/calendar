@@ -35,6 +35,7 @@ export const Input: React.FC<InputProps> = ({
       </span>
       {textBox ? (
         <textarea
+          aria-label={name}
           name={name}
           value={value}
           className={`
@@ -45,6 +46,8 @@ export const Input: React.FC<InputProps> = ({
         />
       ) : (
         <input
+          id='input'
+          aria-label={name}
           type={type}
           name={name}
           value={value}

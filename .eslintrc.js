@@ -11,6 +11,7 @@ module.exports = {
   },
   ignorePatterns: ['node_modules/*'],
   plugins: ['react', '@typescript-eslint', 'eslint-plugin-prettier'],
+  exclude: ['**/__tests__/**', '**/__mocks__/**', '**/__fixtures__/**'],
   rules: {
     'eol-last': ['error', 'always'],
     'react/function-component-definition': 'off',
