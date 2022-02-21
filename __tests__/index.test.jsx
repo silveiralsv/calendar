@@ -69,7 +69,7 @@ describe('Home', () => {
         <Modal />
       </ReminderContext.Provider>
     );
-    const btn = screen.getByRole('button', { name: /Create/i });
+    const btn = screen.getByRole('button', { name: /Save/i });
     btn.click();
     expect(getReminder).toBeCalled();
   });

@@ -30,7 +30,7 @@ type ReminderContextData = {
   // eslint-disable-next-line no-unused-vars
   removeReminder(id: string): void;
   // eslint-disable-next-line no-unused-vars
-  removeAllReminders(ids: string[]): void;
+  removeAllReminders(date: Date): void;
   reminders: ReminderContent[];
 };
 
@@ -86,8 +86,12 @@ export const ReminderProvider: React.FC = ({ children }) => {
   );
 
   const removeAllReminders = useCallback(
-    (ids: string[]) => {
-      const removedReminders = reminders.filter((reminder) => !ids.includes(reminder.id));
+    (date: Date) => {
+      const removedReminders = reminders.filter((reminder) => 
+      reminder?.date?.getDate() !== date?.getDate() &&
+            reminder?.date?.getMonth() !== date?.getMonth() &&
+            reminder?.date?.getFullYear() !== date?.getFullYear()
+      );
       setReminders(removedReminders);
     },
     [reminders]

@@ -230,7 +230,7 @@ export const Modal: React.FC = () => {
             )}
 
             <div className="flex items-center justify-evenly">
-              <SubmitBtn text="Create" loading={isLoading} />
+              <SubmitBtn text="Save" loading={isLoading} />
               <SeccondaryBtn text="Cancel" onClick={() => dismissModal()} />
             </div>
           </form>
