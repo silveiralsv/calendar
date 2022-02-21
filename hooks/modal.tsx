@@ -7,8 +7,6 @@ import { ForecastConditions } from '../components/Map/forecast';
 import { geoApi, weatherApi } from '../services/api';
 
 const appid = process.env.API_KEY
-console.log(`@@@@@ [LOG] ${new Date().toLocaleString()}  -> appid`, appid)
-
 export type LatLongObject = {
   lat: number;
   lng: number;
