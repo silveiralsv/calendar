@@ -1,4 +1,5 @@
 # Calendar App
+![App Image](/calendar.png)
 ## Technology Used
 
 ### [TailwindCSS](https://tailwindcss.com/)
