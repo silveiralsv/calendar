@@ -4,23 +4,20 @@ import moment from 'moment';
 import { AddBtn } from '../Buttons/add';
 import { useReminder } from '../../hooks/reminder';
 import { ReminderPreview } from '../Reminder';
+import { useModal } from '../../hooks/modal';
 
-type CalendarProps = {
-  // eslint-disable-next-line no-unused-vars
-  handleAddReminder: (show: boolean, date: Date) => void;
-};
-
-export const Calendar: React.FC<CalendarProps> = ({ handleAddReminder }) => {
-  const { getRemindersPreview, reminders, removeReminder } = useReminder();
+export const Calendar: React.FC = () => {
+  const { getRemindersPreview, removeReminder, reminders } = useReminder();
+  const { showModal } = useModal();
 
   const weekDaysHeader = moment.weekdays().map((weekDay) => (
-    <th className="bg-rose-400 border-[1px] border-gray-700 text-center text-base md:text-xl" key={weekDay}>
+    <th className="bg-rose-400 border-[1px] border-gray-700 text-center text-base md:text-xl" key={uuid()}>
       <div>{weekDay}</div>
     </th>
   ));
 
   const addTableColum = (content: React.ReactNode, disabled = false) => (
-    <td className={`${disabled ? 'bg-gray-200' : 'bg-white'} border-[1px] border-gray-800 relative group`}>
+    <td key={uuid()} className={`${disabled ? 'bg-gray-200' : 'bg-white'} border-[1px] border-gray-800 relative group`}>
       <div className="absolute top-0 bottom-0 right-0 left-0">{content}</div>
     </td>
   );
@@ -54,8 +51,7 @@ export const Calendar: React.FC<CalendarProps> = ({ handleAddReminder }) => {
             <div className="flex flex-col gap-y-1.5 snap-y max-h-[70%] overflow-x-hidden  group-hover:overflow-y-auto scroll-smooth snap-mandatory px-1">
               {getRemindersPreview(dateAdd)?.map((reminder) => (
                 <ReminderPreview
-                  key={reminder.id}
-                  date={reminder.date}
+                  key={uuid()}
                   id={reminder?.id}
                   removeReminder={() => removeReminder(reminder?.id)}
                   title={reminder?.title}
@@ -65,7 +61,7 @@ export const Calendar: React.FC<CalendarProps> = ({ handleAddReminder }) => {
             </div>
             <AddBtn
               handleAddReminder={() => {
-                handleAddReminder(true, dateAdd);
+                showModal(dateAdd);
               }}
             />
           </>
@@ -94,14 +90,17 @@ export const Calendar: React.FC<CalendarProps> = ({ handleAddReminder }) => {
       parsedResult.push(<tr key={uuid()}>{weekChunk}</tr>);
     }
     return parsedResult;
-  }, [handleAddReminder, reminders]);
+  }, [reminders]);
 
   return (
-    <table className="table-fixed w-full h-full">
-      <thead>
-        <tr>{weekDaysHeader}</tr>
-      </thead>
-      <tbody>{daysInMonth}</tbody>
-    </table>
+    <>
+      {/* <Modal visible={visible} setVisible={setVisible} /> */}
+      <table className="table-fixed w-full h-full">
+        <thead>
+          <tr>{weekDaysHeader}</tr>
+        </thead>
+        <tbody>{daysInMonth}</tbody>
+      </table>
+    </>
   );
 };

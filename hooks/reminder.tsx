@@ -1,33 +1,36 @@
 /* eslint-disable react/jsx-key */
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
+import { ForecastConditions } from '../components/Map/forecast';
 
 const storageKey = '@Calenddar:reminders';
 
-type ReminderContent = {
+export type ReminderContent = {
   id: string;
   date: Date;
   city: string;
   color: string;
-  weather?: string;
   description: string;
   title: string;
+  forecast?: {
+    main: keyof ForecastConditions;
+    description: string;
+    icon: string;
+    temperature: number;
+  };
 };
 
 type ReminderContextData = {
   // eslint-disable-next-line no-unused-vars
-  addReminder(newReminder: Partial<Omit<ReminderContent, 'id'>>): void;
-  // eslint-disable-next-line no-unused-vars
   getReminder(id: string): ReminderContent | undefined;
   // eslint-disable-next-line no-unused-vars
-  upsertReminder(newReminder: Partial<Omit<ReminderContent, 'id'>>, id?: string): void;
+  upsertReminder(newReminder: Partial<ReminderContent>): void;
   // eslint-disable-next-line no-unused-vars
   getRemindersPreview(date: Date): ReminderContent[];
   // eslint-disable-next-line no-unused-vars
   removeReminder(id: string): void;
   // eslint-disable-next-line no-unused-vars
   removeAllReminders(ids: string[]): void;
-  getAllReminders(): ReminderContent[];
   reminders: ReminderContent[];
 };
 
@@ -51,14 +54,6 @@ export const ReminderProvider: React.FC = ({ children }) => {
     localStorage.setItem(storageKey, JSON.stringify(reminders));
   }, [reminders]);
 
-  const addReminder = useCallback((reminder: Omit<ReminderContent, 'id'>) => {
-    const newReminder = {
-      ...reminder,
-      id: uuid(),
-    };
-    setReminders((old) => [...old, newReminder]);
-  }, []);
-
   const removeReminder = useCallback(
     (id: string) => {
       const removedReminders = reminders.filter((reminder) => reminder.id !== id);
@@ -66,10 +61,6 @@ export const ReminderProvider: React.FC = ({ children }) => {
     },
     [reminders]
   );
-
-  const getAllReminders = useCallback(() => {
-    return reminders;
-  }, []);
 
   const getRemindersPreview = useCallback(
     (date: Date) => {
@@ -109,7 +100,7 @@ export const ReminderProvider: React.FC = ({ children }) => {
       setReminders((olds) => {
         const deduped = olds.filter((i) => i.id !== newReminder.id);
 
-        return [...deduped, newReminder];
+        return [...deduped, { ...newReminder }];
       });
     },
     [reminders]
@@ -120,11 +111,9 @@ export const ReminderProvider: React.FC = ({ children }) => {
       value={{
         reminders,
         getRemindersPreview,
-        addReminder,
         getReminder,
         removeReminder,
         removeAllReminders,
-        getAllReminders,
         upsertReminder,
       }}
     >
