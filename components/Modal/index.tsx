@@ -120,25 +120,37 @@ export const Modal: React.FC<ModalProps> = () => {
       temperature: 0,
     };
     try {
-      const { data } = await geoApi.get('direct', {
-        params: {
-          q: cityName,
-          appid: '6482b9251ae8db457c4cb602b8dd6c7a',
-        },
-      });
+      const { data } = await geoApi.get(
+        `direct?q=${cityName}&appid=${'6482b9251ae8db457c4cb602b8dd6c7a'}`
+        // , {
+        //   params: {
+        //     q: cityName,
+        //     appid: '6482b9251ae8db457c4cb602b8dd6c7a',
+        //   },
+        //   headers: {
+        //     'Access-Control-Allow-Origin': '*',
+        //   },
+        // }
+      );
 
       const { lat, lon } = data?.[0] || { lat: 0, lon: 0 };
 
       if (lat && lon) {
         let temperature: number = 0;
-        const { data: forecastData } = await weatherApi.get('onecall', {
-          params: {
-            lat,
-            lon,
-            exclude: 'minutely,hourly',
-            appid: '6482b9251ae8db457c4cb602b8dd6c7a',
-          },
-        });
+        const { data: forecastData } = await weatherApi.get(
+          `onecall?lat=${lat}&lon=${lon}&exclude=${'minutely,hourly'}&appid=${'6482b9251ae8db457c4cb602b8dd6c7a'}`
+          // {
+          //   params: {
+          //     lat,
+          //     lon,
+          //     exclude: 'minutely,hourly',
+          //     appid: '6482b9251ae8db457c4cb602b8dd6c7a',
+          //   },
+          //   headers: {
+          //     'Access-Control-Allow-Origin': '*',
+          //   },
+          // }
+        );
 
         const dayForecast = (forecastData?.daily.find(
           (i: {
