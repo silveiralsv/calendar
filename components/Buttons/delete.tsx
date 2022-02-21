@@ -2,12 +2,12 @@ import React from 'react';
 
 import { FaTrashAlt } from 'react-icons/fa';
 
-type DeleteBtn = {
+type DeleteBtnProps = {
   // eslint-disable-next-line no-unused-vars
   onClick: (...props: any) => void;
 };
 
-export const DeleteBtn: React.FC<DeleteBtn> = ({ onClick }) => {
+export const DeleteBtn: React.FC<DeleteBtnProps> = ({ onClick }) => {
   return (
     <button
       className="
