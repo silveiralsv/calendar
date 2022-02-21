@@ -125,9 +125,6 @@ export const Modal: React.FC<ModalProps> = () => {
           q: cityName,
           appid: '6482b9251ae8db457c4cb602b8dd6c7a',
         },
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-        },
       });
 
       const { lat, lon } = data?.[0] || { lat: 0, lon: 0 };
@@ -140,9 +137,6 @@ export const Modal: React.FC<ModalProps> = () => {
             lon,
             exclude: 'minutely,hourly',
             appid: '6482b9251ae8db457c4cb602b8dd6c7a',
-          },
-          headers: {
-            'Access-Control-Allow-Origin': '*',
           },
         });
 
