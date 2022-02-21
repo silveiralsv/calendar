@@ -1,5 +1,5 @@
 /* eslint-disable no-unsafe-optional-chaining */
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   FaCloud,
   FaCloudRain,
@@ -55,6 +55,7 @@ export const Modal: React.FC<ModalProps> = () => {
   const { visible, dismissModal, reminderId, date } = useModal();
   const { upsertReminder } = useReminder();
   const { getReminder } = useReminder();
+  const [isLoading, setIsLoading] = useState(false);
   const [form, setForm] = useState<FormType>({
     color: '#bbbbbb',
   } as FormType);
@@ -78,6 +79,7 @@ export const Modal: React.FC<ModalProps> = () => {
         description: remind.description,
         color: remind.color,
       }));
+
       setForecast(
         (old) =>
           ({
@@ -88,8 +90,24 @@ export const Modal: React.FC<ModalProps> = () => {
             temperature: remind.forecast?.temperature,
           } as ForecastObject)
       );
+    } else {
+      setForm((old) => ({
+        ...old,
+        title: '',
+        city: '',
+        date: moment(date).format('YYYY-MM-DDThh:mm'),
+        description: '',
+        color: '#bbbbbb',
+      }));
+
+      setForecast({
+        main: 'Unknown',
+        description: '',
+        icon: '',
+        temperature: 0,
+      });
     }
-  }, [reminderId, visible]);
+  }, [reminderId, visible, getReminder]);
 
   const getForecast = async (cityName: string, reminderDate: Date) => {
     let foreCastResult: ForecastObject = {
@@ -162,6 +180,7 @@ export const Modal: React.FC<ModalProps> = () => {
     const { city, color, date: formDate, description, title } = form;
     const parsedDate = new Date(formDate);
 
+    setIsLoading(true);
     const forecastForNewReminder = await getForecast(city, parsedDate);
 
     upsertReminder({
@@ -174,6 +193,7 @@ export const Modal: React.FC<ModalProps> = () => {
       forecast: forecastForNewReminder,
     });
     dismissModal();
+    setIsLoading(false);
     setForm({
       city: '',
       date: '',
@@ -183,19 +203,6 @@ export const Modal: React.FC<ModalProps> = () => {
     });
   };
 
-  const reminderForecast = useMemo<ForecastObject>(() => {
-    const existingReminder = getReminder(reminderId);
-    if (existingReminder) {
-      return existingReminder.forecast as ForecastObject;
-    }
-    return {
-      main: 'Unknown',
-      description: '',
-      icon: '',
-      temperature: 0,
-    };
-  }, [reminderId]);
-  console.log(`@@@@@ [LOG] ${new Date().toLocaleString()}  -> reminderForecast`, reminderForecast);
   return (
     <div
       className={`
@@ -251,7 +258,7 @@ export const Modal: React.FC<ModalProps> = () => {
             )}
 
             <div className="flex items-center justify-evenly">
-              <SubmitBtn text="Create" />
+              <SubmitBtn text="Create" loading={isLoading} />
               <SeccondaryBtn text="Cancel" onClick={() => dismissModal()} />
             </div>
           </form>

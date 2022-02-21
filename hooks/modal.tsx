@@ -42,11 +42,6 @@ type ModalContextData = {
   visible: boolean;
   date: Date;
   reminderId: string;
-  forecast: ForecastObject;
-  handleSubmitForm: () => void;
-  handleFormChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  form: FormType;
-  renderForecast: () => React.ReactElement;
 };
 
 const ModalContext = createContext<ModalContextData>({} as ModalContextData);
@@ -65,31 +60,6 @@ export const ModalProvider: React.FC = ({ children }) => {
   const dismissModal = useCallback(() => {
     setVisible(false);
   }, []);
-
-  // const renderForecast = useCallback(() => {
-  //   const result: ForecastConditions = {
-  //     Thunderstorm: <FaCloudShowersHeavy className="w-5 h-5 fill-gray-500" />,
-  //     Drizzle: <FaCloudSunRain className="w-5 h-5 fill-sky-500" />,
-  //     Rain: <FaCloudRain className="w-5 h-5 fill-blue-500" />,
-  //     Snow: <FaSnowflake className="w-5 h-5 fill-sky-400" />,
-  //     Mist: <FaCloudSun className="w-5 h-5 fill-gray-400" />,
-  //     Clear: <FaSun className="w-5 h-5 fill-yellow-500" />,
-  //     Clouds: <FaCloud className="w-5 h-5 fill-gray-500" />,
-  //     Unknown: <FaQuestionCircle className="w-5 h-5 fill-yellow-500" />,
-  //   };
-
-  //   return (
-  //     <div className="flex gap-x-4 items-center">
-  //       <span>Forecast: </span>
-  //       {forecast.main !== 'Unknown' && (
-  //         <span className="flex items-center gap-x-1">
-  //           {result[forecast.main]}
-  //           {forecast.temperature && <span className="text-sm">{`(${forecast.temperature})`}°C</span>}
-  //         </span>
-  //       )}
-  //     </div>
-  //   );
-  // }, [forecast]);
 
   return (
     <ModalContext.Provider

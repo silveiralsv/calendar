@@ -1,16 +1,18 @@
 import React from 'react';
+import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 
 type SubmitButtonProps = {
   text: string;
+  loading?: boolean;
 };
 
-export const SubmitBtn: React.FC<SubmitButtonProps> = ({ text }) => {
+export const SubmitBtn: React.FC<SubmitButtonProps> = ({ text, loading = false }) => {
   return (
     <button
       type="submit"
-      className="bg-rose-500 hover:bg-rose-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-all delay-100"
+      className="bg-rose-500 hover:bg-rose-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-all delay-100 min-w-[81px]  flex justify-center items-center"
     >
-      {text}
+      {loading ? <AiOutlineLoading3Quarters className="animate-spin w-5 h-5 fill-white" /> : text}
     </button>
   );
 };
