@@ -6,6 +6,8 @@ import { v4 as uuid } from 'uuid';
 import { ForecastConditions } from '../components/Map/forecast';
 import { geoApi, weatherApi } from '../services/api';
 
+const appid = process.env.API_KEY
+console.log(`@@@@@ [LOG] ${new Date().toLocaleString()}  -> appid`, appid)
 
 export type LatLongObject = {
   lat: number;
@@ -63,7 +65,7 @@ export const ModalProvider: React.FC = ({ children }) => {
       const { data } = await geoApi.get('direct', {
         params: {
           q: cityName,
-          appid: '6482b9251ae8db457c4cb602b8dd6c7a',
+          appid,
         },
       });
 
@@ -76,7 +78,7 @@ export const ModalProvider: React.FC = ({ children }) => {
             lat,
             lon,
             exclude: 'minutely,hourly',
-            appid: '6482b9251ae8db457c4cb602b8dd6c7a',
+            appid,
           },
         });
 
