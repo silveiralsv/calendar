@@ -63,7 +63,7 @@ export const ModalProvider: React.FC = ({ children }) => {
       const { data } = await geoApi.get('direct', {
         params: {
           q: cityName,
-          appid,
+          appid: appid,
         },
       });
 
@@ -76,7 +76,7 @@ export const ModalProvider: React.FC = ({ children }) => {
             lat,
             lon,
             exclude: 'minutely,hourly',
-            appid,
+            appid: appid,
           },
         });
 
