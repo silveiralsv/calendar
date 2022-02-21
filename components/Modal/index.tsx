@@ -60,7 +60,6 @@ export const Modal: React.FC = () => {
     color: '#1e293b',
   } as FormType);
   
-  console.log(`@@@@@ [LOG] ${new Date().toLocaleString()}  -> form`, form)
   const [forecast, setForecast] = useState<ForecastObject>({} as ForecastObject);
 
   useEffect(() => {
@@ -132,7 +131,6 @@ export const Modal: React.FC = () => {
     if (!isValid) return;
     const { city, color, date: formDate, description, title } = form;
     const parsedDate = new Date(formDate);
-    console.log(`@@@@@ [LOG] ${new Date().toLocaleString()}  -> parsedDate`, parsedDate)
     setIsLoading(true);
 
     const forecastForNewReminder = await getForecast(city, parsedDate);

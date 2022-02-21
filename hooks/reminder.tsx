@@ -97,7 +97,6 @@ export const ReminderProvider: React.FC = ({ children }) => {
   const upsertReminder = useCallback(
     (newReminder: ReminderContent) => {
       if (!newReminder?.id) newReminder.id = uuid();
-      console.log(`@@@@@ [LOG] ${new Date().toLocaleString()}  -> newReminder`, newReminder)
 
       setReminders((olds) => {
         const deduped = olds.filter((i) => i.id !== newReminder.id);
