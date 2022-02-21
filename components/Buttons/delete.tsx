@@ -18,9 +18,9 @@ export const DeleteBtn: React.FC<DeleteBtn> = ({ onClick }) => {
         group-hover:opacity-100
         transition-all
         delay-100
-        hover:bg-rose-700
+        hover:bg-slate-600
         rounded
-      bg-rose-500
+      bg-slate-900
         w-6
         h-6
         flex

@@ -23,7 +23,7 @@ export const Calendar: React.FC = () => {
 
   const months = useMemo(() => getAllYearMonths(), []);
   const weekDaysHeader = moment.weekdays().map((weekDay) => (
-    <th className="bg-rose-400 border-[1px] border-gray-700 text-center text-base md:text-lg" key={uuid()}>
+    <th className="bg-slate-800 border-[1px] border-gray-700 text-slate-50 text-center text-base md:text-lg" key={uuid()}>
       <div>{weekDay}</div>
     </th>
   ));
@@ -116,17 +116,17 @@ export const Calendar: React.FC = () => {
   }, [reminders, selectedMonth]);
 
   return (
-    <>
-      <div className="flex w-full bg-rose-400 items-center justify-center">
+    <div className='flex flex-col w-screen h-screen'>
+      <div className="flex w-full bg-slate-800 items-center justify-center">
         <select
-          className=" flex justify-center font-bold text-gray-900 border-0 bg-rose-400   h-10 px-4 py-1 focus:border-0"
+          className=" font-bold text-slate-50 border-0 border-slate-900 bg-slate-800 focus:border-0"
           onChange={(e) => {
             setSelectecMonth(moment(new Date(e.target.value)).startOf('month'));
           }}
         >
           {months.map((month) => (
             <option
-              className="font-semibold bg-white "
+              className="font-semibold bg-slate-800 text-slate-50 border-0"
               key={uuid()}
               value={month.format('YYYY-MM-DDTHH:mm')}
               selected={month.format('YYYY-MM-DD') === selectedMonth.format('YYYY-MM-DD')}
@@ -142,6 +142,6 @@ export const Calendar: React.FC = () => {
         </thead>
         <tbody>{daysInMonth}</tbody>
       </table>
-    </>
+    </div>
   );
 };

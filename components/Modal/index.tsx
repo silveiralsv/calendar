@@ -57,7 +57,7 @@ export const Modal: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [erro, setError] = useState<FormType>({} as FormType);
   const [form, setForm] = useState<FormType>({
-    color: '#bbbbbb',
+    color: '#1e293b',
   } as FormType);
 
   const [forecast, setForecast] = useState<ForecastObject>({} as ForecastObject);
@@ -67,7 +67,7 @@ export const Modal: React.FC = () => {
     let result: ReminderContent = {
       id: '',
       city: '',
-      color: '#bbbbbb',
+      color: '#1e293b',
       date: date,
       description: '',
       title: '',
@@ -154,7 +154,7 @@ export const Modal: React.FC = () => {
       date: '',
       title: '',
       description: '',
-      color: '#bbbbbb',
+      color: '#1e293b',
     });
   }, [form, reminderId]);
 
